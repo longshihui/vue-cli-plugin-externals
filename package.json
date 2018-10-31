@@ -1,0 +1,53 @@
+{
+  "name": "vue-cli-plugin-externals",
+  "version": "1.0.0",
+  "description": "Manage external modules in your project in vue-cli 3.x",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:longshihui/vue-cli-plugin-externals.git"
+  },
+  "homepage": "https://github.com/longshihui/vue-cli-plugin-externals#readme",
+  "bugs": {
+    "url": "https://github.com/longshihui/vue-cli-plugin-externals/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue-cli",
+    "vue-cli-plugin",
+    "externals",
+    "cdn-modules"
+  ],
+  "author": "colorless",
+  "license": "ISC",
+  "devDependencies": {
+    "commitizen": "^3.0.4",
+    "cz-conventional-changelog": "^2.1.0",
+    "husky": "^1.1.2",
+    "lint-staged": "^8.0.3",
+    "prettier": "^1.14.3"
+  },
+  "dependencies": {
+    "html-webpack-externals-plugin": "^3.8.0",
+    "lodash": "^4.17.11"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,vue,json,css,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
