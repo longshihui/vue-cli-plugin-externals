@@ -15,13 +15,13 @@ vue add externals
 yarn
 
 ```
-yarn add vue-cli-plugin-externals
+yarn add vue-cli-plugin-externals --dev
 ```
 
 npm
 
 ```
-npm install vue-cli-plugin-externals
+npm install vue-cli-plugin-externals --dev
 ```
 
 ## 功能：

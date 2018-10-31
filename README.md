@@ -17,13 +17,13 @@ vue add externals
 Yarn
 
 ```
-yarn add vue-cli-plugin-externals
+yarn add vue-cli-plugin-externals --dev
 ```
 
 Npm
 
 ```
-npm install vue-cli-plugin-externals
+npm install vue-cli-plugin-externals --dev
 ```
 
 ## Features:
