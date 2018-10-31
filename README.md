@@ -65,11 +65,11 @@ In a single page application:
 // vue.config.js
 {
     pluginOptions: {
-        Externals: [
+        externals: [
             {
-                Module: 'jquery',
-                Entry: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
-                Global: 'jQuery',
+                module: 'jquery',
+                entry: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
+                global: 'jQuery',
             },
         ]
     }
@@ -80,20 +80,20 @@ In a multi-page application:
 
 ```
 {
-    Pages: {
-        Index: {
+    pages: {
+        index: {
             ...other configuration items
-            Externals: [
+            externals: [
                 {
-                    Module: 'cdnModule1',
-                    Entry: [
+                    module: 'cdnModule1',
+                    entry: [
                         '//pkg.cdn.com/cdnModule1.css',
                         '//pkg.cdn.com/cdnModule1.js'
                     ]
                 },
                 {
-                    Module: 'cdnModule2',
-                    Entry: [
+                    module: 'cdnModule2',
+                    entry: [
                         '//pkg.cdn.com/cdnModule2.js'
                     ]
                 }
@@ -101,11 +101,11 @@ In a multi-page application:
         }
     }
     pluginOptions: {
-        Externals: [
+        externals: [
             {
-                Module: 'jquery',
-                Entry: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
-                Global: 'jQuery',
+                module: 'jquery',
+                entry: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
+                global: 'jQuery',
             },
         ]
     }
