@@ -109,5 +109,8 @@ pages中的externals优先级高于pluginOptions中的externals
     }
 }
 ```
+## 问题
 
+如果本插件执行之后添加了HTML-的WebPack-插件，会导致本插件失效，具体原因如下:
 
+https://github.com/jantimon/html-webpack-plugin/issues/1031

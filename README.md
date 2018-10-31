@@ -112,4 +112,10 @@ In a multi-page application:
 }
 ```
 
+## Question
+
+If the html-webpack-plugin is added after the plugin is executed, the plugin will be invalidated. The specific reasons are as follows:
+
+https://github.com/jantimon/html-webpack-plugin/issues/1031
+
 
