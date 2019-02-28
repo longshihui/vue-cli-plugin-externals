@@ -32,119 +32,79 @@
 const _ = require('lodash');
 const HtmlWebpackExternalsPlugin = require('html-webpack-externals-plugin');
 
-/**
- * 是否是单页应用
- * @param pageOptions
- * @return {boolean}
- */
-function isSPA(pageOptions) {
-    return Object.keys(pageOptions).length === 0;
+function module2HtmlWebpackExternalsPluginOptions(modules) {
+    const options = [];
+    modules.forEach(module => {
+        options.push({
+            module: module.id,
+            entry: module.assets,
+            global: module.global
+        })
+    });
+    return options;
 }
-function hasExternals(pageOption) {
-    return 'externals' in pageOption && Array.isArray(pageOption.externals) && pageOption.externals.length > 0;
-}
-/**
- * 判断页面配置不包含externals字段
- * @param pageOptions
- * @return {boolean}
- */
-function withoutExternals(pageOptions) {
-    return Object.keys(pageOptions).every((pageName) => hasExternals(pageOptions[pageName]));
+
+function appendWebpackExternalsConfig(config, modules) {
+    // 生成webpack externals配置对象
+    let webpackExternals = {};
+    modules.forEach((module, moduleId) => {
+        webpackExternals[moduleId] = module.global;
+    });
+    config.externals(webpackExternals);
 }
 
 module.exports = (api, projectOptions) => {
+    const modules = new Map();
+    const commonModules = new Map();
+    const pagesModules = new Map();
     // 页面配置
-    const pageOptions = projectOptions.pages || {};
+    const pages = projectOptions.pages || {};
     // 通用外部模块配置
-    let commonExternals = _.get(projectOptions, 'pluginOptions.externals', []);
+    const commonOptions = _.get(projectOptions, 'pluginOptions.externals.common', []);
+    const pagesOptions = _.get(projectOptions, 'pluginOptions.externals.pages', {});
     
-    if (isSPA(pageOptions)) {
-        // 如果为单页应用，且通用externals为空，则什么都不做
-        if (!commonExternals.length) {
-            return;
-        }
-    } else {
-        // 如果为多页应用，且页面级配置以及通用externals为空，则什么都不做
-        if (withoutExternals(pageOptions) && !commonExternals.length) {
-            return;
-        }
+    if (Array.isArray(commonOptions)) {
+        commonOptions.forEach(module => {
+            modules.set(module.id, module);
+            commonModules.set(module.id, module);
+        })
     }
     
-    if (isSPA(pageOptions)) {
-        api.chainWebpack((config) => {
-            config.plugin('externals-modules')
-                .use(HtmlWebpackExternalsPlugin, [
-                    {
-                        externals: commonExternals
-                    }
-                ]);
-            
-            config.externals(
-                commonExternals.reduce((webpackExternals, moduleOption) => {
-                    webpackExternals[moduleOption.module] = moduleOption.global;
-                }, {})
-            );
-        });
-    } else {
-        // 通用外部模块
-        const commonModules = new Set();
-        // 页面级别外部模块
-        const pageModules = new Map();
-        // 所有外部模块
-        const allModules = new Map();
-        // 将所有通用外部模块添加至commonModules中
-        // 方便在多页应用时去重
-        if (commonExternals.length > 0) {
-            commonExternals.forEach((moduleOption) => {
-                // 将名字添加至外部模块集合
-                commonModules.set(moduleOption.module);
-                // 注册至全部模块
-                allModules.set(moduleOption.module, moduleOption);
-            });
-        }
-        
-        Object.keys(pageOptions)
-        // 筛选出含有externals配置的页面配置
-            .filter((pageName) => hasExternals(pageOptions[pageName]))
-            // 根据通用外部模块将每一个页面配置的外部模块进行去重
-            .forEach((pageName) => {
-                const externals = pageOptions[pageName].externals;
-                pageModules.set(pageName, []);
-                externals.forEach((moduleOption) => {
-                    // 判断公共externals是否含有模块，如果有，则不添加module
-                    if (!commonModules.has(moduleOption.module)) {
-                        pageModules.get(pageName).push(moduleOption);
-                        allModules.set(moduleOption.module, moduleOption);
+    if (_.isPlainObject(pagesOptions)) {
+        Object.keys(pages).forEach(pageName => {
+            const pageModules = new Map();
+            if (pageName in pagesOptions) {
+                pagesOptions[pageName].forEach(module => {
+                    if (!commonModules.has(module.id)) {
+                        modules.set(module.id, module);
+                        pageModules.set(module.id, module);
                     }
                 })
-            });
-        
-        api.chainWebpack((config) => {
-            if (commonModules.size > 0) {
-                config.plugin('externals-modules')
-                    .use(HtmlWebpackExternalsPlugin, [
-                        {
-                            externals: commonExternals
-                        }
-                    ]);
             }
-            
-            for (let [pageName, moduleOptions] of pageModules) {
-                let pageOption = pageOptions[pageName];
-                config.plugin(`${pageName}-externals-modules`)
-                    .use(HtmlWebpackExternalsPlugin, [
-                        {
-                            externals: moduleOptions,
-                            files: [pageOption.filename || pageName + '.html']
-                        }
-                    ]);
+            if (pageModules.size > 0) {
+                pagesModules.set(pageName, pageModules);
             }
-            // 生成webpack externals配置对象
-            let webpackExternals = {};
-            allModules.forEach((moduleOption, moduleGlobalName) => {
-                webpackExternals[moduleOption.module] = moduleGlobalName
-            });
-            config.externals(webpackExternals);
-        });
+        })
     }
+    
+    api.chainWebpack(config => {
+        config.plugin('externals-modules')
+            .use(HtmlWebpackExternalsPlugin, [
+                {
+                    externals: module2HtmlWebpackExternalsPluginOptions(commonModules)
+                }
+            ]);
+        
+        for (let [pageName, pageModules] of pagesModules) {
+            let pageOption = pages[pageName];
+            config.plugin(`${pageName}-externals-modules`)
+                .use(HtmlWebpackExternalsPlugin, [
+                    {
+                        externals: module2HtmlWebpackExternalsPluginOptions(pageModules),
+                        files: [pageOption.filename || pageName + '.html']
+                    }
+                ]);
+        }
+        appendWebpackExternalsConfig(config)
+    });
 };
