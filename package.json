@@ -2,7 +2,7 @@
   "name": "vue-cli-plugin-externals",
   "version": "1.0.4",
   "description": "Manage external modules in your project in vue-cli 3.x",
-  "main": "./lib/index.js",
+  "main": "./service/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

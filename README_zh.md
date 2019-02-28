@@ -8,68 +8,96 @@
 
 vue-cli 3.x
 
-```
+```bash
 vue add externals
 ```
 
 yarn
 
-```
+```bash
 yarn add vue-cli-plugin-externals --dev
 ```
 
 npm
 
-```
+```bash
 npm install vue-cli-plugin-externals --dev
 ```
 
 ## 功能：
 
-1. 多页面下可以配置页面级别的externals
-2. 根据配置自动去重配置webpack externals
+1. 配置外部模块页面级别、所有页面级别
+2. 自动注入webpack externals配置
 3. 将外部模块的cdn自动注入生成的html中
 
 ## 思路：
 
-配置在vue.config.js中，可配置的地方：
+插件配置的命名空间为externals，插件配置项由以下两个部分组成：
 
-1. pages里面某个页面配置的externals字段，作为某一个页面的外部模块
-2. pluginOptions externals字段，作为所有页面的通用外部模块
+1. pages配置的页面级别的外部模块
+2. common配置的所有页面级别的外部模块
 
-pluginOptions和page里的externals的类型相同，都为ModuleOption[]
-ModuleOption的数据结构参考[html-webpack-externals-plugin的externals](https://github.com/mmiller42/html-webpack-externals-plugin#cdn-example)配置
+当应用为单页应用时，只需配置common字段即可
+
+外部模块配置的数据结构为**Module**，数据结构如下
+
+```javascript
+// Module
+{
+    id: string, // Module唯一标识符
+    assets: string | string[],  // 资源路径
+    global: string // 模块暴露的全局变量的名字
+}
+```
+
+整体的插件配置数据结构如下：
+
+```nodejs
+//vue.config.js
+module.exports = {
+    pluginOptions: {
+        externals: {
+            common: Module[],
+            pages: {
+                pageName: Module[]
+            }
+        }
+    }
+}
+```
 
 ## 优先级：
 
-pages中的externals优先级高于pluginOptions中的externals
+pages中的外部模块优先级高于common中的外部模块
 
 ## 模块去重思路：
 
-根据Module.module来进行去重
+根据Module.id来进行去重
 
 ## 执行流程：
 
-1. 解析好pages和pluginOptions中指定的模块配置
+1. 解析好模块配置
 2. 判断是否是单页还是多页应用
 3. 合并去重，将模块externals信息添加到webpack externals模块
 4. 根据配置添加html-webpack-externals-plugin插件实例至webpack plugin
 
-## 配置
+## 例子
 
 在单页应用中：
 
-```
+```javascript
 // vue.config.js
 {
     pluginOptions: {
-        externals: [
-            {
-                module: 'jquery',
-                entry: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
-                global: 'jQuery',
-            },
-        ]
+        externals: {
+            common: [
+                {
+                    id: 'jquery',
+                    assets: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
+                    global: 'jQuery',
+                },
+            ]
+        }
     }
 }
 ```
@@ -79,38 +107,42 @@ pages中的externals优先级高于pluginOptions中的externals
 ```
 {
     pages: {
-        index: {
-            ...其他配置项
-            externals: [
-                {
-                    module: 'cdnModule1',
-                    entry: [
-                        '//pkg.cdn.com/cdnModule1.css',
-                        '//pkg.cdn.com/cdnModule1.js'
-                    ]
-                },
-                {
-                    module: 'cdnModule2',
-                    entry: [
-                        '//pkg.cdn.com/cdnModule2.js'
-                    ]
-                }
-            ]
-        }
+        index: './src/index.js'
     }
     pluginOptions: {
-        externals: [
-            {
-                module: 'jquery',
-                entry: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
-                global: 'jQuery',
-            },
-        ]
+        externals: {
+            common: [
+                {
+                    id: 'jquery',
+                    assets: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
+                    global: 'jQuery',
+                },
+            ],
+            pages: {
+                index: [
+                        {
+                            id: 'cdnModule1',
+                            assets: [
+                                '//pkg.cdn.com/cdnModule1.css',
+                                '//pkg.cdn.com/cdnModule1.js'
+                            ]
+                        },
+                        {
+                            id: 'cdnModule2',
+                            assets: [
+                                '//pkg.cdn.com/cdnModule2.js'
+                            ]
+                        }
+                ]
+            }
+        }
     }
 }
 ```
 ## 问题
 
-如果本插件执行之后添加了HTML-的WebPack-插件，会导致本插件失效，具体原因如下:
+如果本插件执行之后添加了html-webpack-plugin，会导致本插件失效，具体原因如下:
 
 https://github.com/jantimon/html-webpack-plugin/issues/1031
+
+
