@@ -21,7 +21,7 @@
  * pages中的externals优先级高于pluginOptions中的externals
  *
  * 模块去重思路：
- * 根据Module.module来进行去重
+ * 根据Module.id来进行去重
  *
  * 执行流程：
  * 1. 解析好pages和pluginOptions中指定的模块配置
@@ -62,7 +62,6 @@ module.exports = (api, projectOptions) => {
     // 通用外部模块配置
     const commonOptions = _.get(projectOptions, 'pluginOptions.externals.common', []);
     const pagesOptions = _.get(projectOptions, 'pluginOptions.externals.pages', {});
-    
     if (Array.isArray(commonOptions)) {
         commonOptions.forEach(module => {
             modules.set(module.id, module);
@@ -72,29 +71,30 @@ module.exports = (api, projectOptions) => {
     
     if (_.isPlainObject(pagesOptions)) {
         Object.keys(pages).forEach(pageName => {
-            const pageModules = new Map();
             if (pageName in pagesOptions) {
+                const pageModules = new Map();
                 pagesOptions[pageName].forEach(module => {
                     if (!commonModules.has(module.id)) {
                         modules.set(module.id, module);
                         pageModules.set(module.id, module);
                     }
-                })
-            }
-            if (pageModules.size > 0) {
-                pagesModules.set(pageName, pageModules);
+                });
+                if (pageModules.size > 0) {
+                    pagesModules.set(pageName, pageModules);
+                }
             }
         })
     }
     
     api.chainWebpack(config => {
-        config.plugin('externals-modules')
-            .use(HtmlWebpackExternalsPlugin, [
-                {
-                    externals: module2HtmlWebpackExternalsPluginOptions(commonModules)
-                }
-            ]);
-        
+        if (commonModules.size) {
+            config.plugin('externals-modules')
+                .use(HtmlWebpackExternalsPlugin, [
+                    {
+                        externals: module2HtmlWebpackExternalsPluginOptions(commonModules)
+                    }
+                ]);
+        }
         for (let [pageName, pageModules] of pagesModules) {
             let pageOption = pages[pageName];
             config.plugin(`${pageName}-externals-modules`)
@@ -105,6 +105,6 @@ module.exports = (api, projectOptions) => {
                     }
                 ]);
         }
-        appendWebpackExternalsConfig(config)
+        appendWebpackExternalsConfig(config, modules);
     });
 };

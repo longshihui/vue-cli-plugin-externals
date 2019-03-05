@@ -4,7 +4,7 @@
   "description": "Manage external modules in your project in vue-cli 3.x",
   "main": "./service/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -24,11 +24,16 @@
   "author": "colorless",
   "license": "ISC",
   "devDependencies": {
+    "@vue/cli": "^3.4.1",
+    "@vue/cli-service": "^3.4.1",
     "commitizen": "^3.0.4",
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^1.1.2",
+    "jest": "^24.1.0",
     "lint-staged": "^8.0.3",
-    "prettier": "^1.14.3"
+    "prettier": "^1.14.3",
+    "rimraf": "^2.6.3",
+    "vue-template-compiler": "^2.6.8"
   },
   "dependencies": {
     "html-webpack-externals-plugin": "^3.8.0",
