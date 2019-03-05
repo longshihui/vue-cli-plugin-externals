@@ -68,7 +68,7 @@ module.exports = {
 
 ## 优先级：
 
-pages中的外部模块优先级高于common中的外部模块
+通用模块 > 页面摸块(主要被webpack externals限制)
 
 ## 模块去重思路：
 
@@ -125,13 +125,15 @@ pages中的外部模块优先级高于common中的外部模块
                             assets: [
                                 '//pkg.cdn.com/cdnModule1.css',
                                 '//pkg.cdn.com/cdnModule1.js'
-                            ]
+                            ],
+                            global: 'cdnModule1'
                         },
                         {
                             id: 'cdnModule2',
                             assets: [
                                 '//pkg.cdn.com/cdnModule2.js'
-                            ]
+                            ],
+                            global: 'cdnModule1'
                         }
                 ]
             }

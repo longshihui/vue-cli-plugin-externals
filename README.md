@@ -2,37 +2,39 @@
 
 > Manage external modules in the project
 
-** Currently only supports cdn module**
+**Currently only supports cdn module**
 
-[中文文档](./README_zh.md)
+## Translation
+
+[中文](./README_zh.md)
 
 ## Use
 
 Vue-cli 3.x
 
 ```bash
-Vue add externals
+vue add externals
 ```
 
 Yarn
 
 ```bash
-Yarn add vue-cli-plugin-externals --dev
+yarn add vue-cli-plugin-externals --dev
 ```
 
 Npm
 
 ```bash
-Npm install vue-cli-plugin-externals --dev
+npm install vue-cli-plugin-externals --dev
 ```
 
-## Features
+## Features:
 
 1. Configure external module page level, all page levels
 2. Automatically inject webpack externals configuration
 3. Automatically inject the cdn of the external module into the generated html
 
-## Ideas
+## Ideas:
 
 The namespace of the plugin configuration is externals, and the plugin configuration item consists of the following two parts:
 
@@ -56,11 +58,11 @@ The overall plugin configuration data structure is as follows:
 
 ```nodejs
 //vue.config.js
-Module.exports = {
+module.exports = {
     pluginOptions: {
-        Externals: {
-            Common: Module[],
-            Pages: {
+        externals: {
+            common: Module[],
+            pages: {
                 pageName: Module[]
             }
         }
@@ -70,7 +72,7 @@ Module.exports = {
 
 ## Priority
 
-External modules in pages have higher priority than external modules in common
+General Module > Page Touch Block (mainly limited by webpack externals)
 
 ## Module to de-thinking ideas:
 
@@ -91,12 +93,12 @@ In a single page application:
 // vue.config.js
 {
     pluginOptions: {
-        Externals: {
-            Common: [
+        externals: {
+            common: [
                 {
-                    Id: 'jquery',
-                    Assets: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
-                    Global: 'jQuery',
+                    id: 'jquery',
+                    assets: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
+                    global: 'jQuery',
                 },
             ]
         }
@@ -108,32 +110,34 @@ In a multi-page application:
 
 ```
 {
-    Pages: {
+    pages: {
         Index: './src/index.js'
     }
     pluginOptions: {
-        Externals: {
-            Common: [
+        externals: {
+            common: [
                 {
-                    Id: 'jquery',
-                    Assets: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
-                    Global: 'jQuery',
+                    id: 'jquery',
+                    assets: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
+                    global: 'jQuery',
                 },
             ],
-            Pages: {
-                Index: [
+            pages: {
+                index: [
                         {
-                            Id: 'cdnModule1',
-                            Assets: [
+                            id: 'cdnModule1',
+                            assets: [
                                 '//pkg.cdn.com/cdnModule1.css',
                                 '//pkg.cdn.com/cdnModule1.js'
-                            ]
+                            ],
+                            global: 'cdnModule1'
                         },
                         {
-                            Id: 'cdnModule2',
-                            Assets: [
+                            id: 'cdnModule2',
+                            assets: [
                                 '//pkg.cdn.com/cdnModule2.js'
-                            ]
+                            ],
+                            global: 'cdnModule1'
                         }
                 ]
             }
@@ -141,7 +145,7 @@ In a multi-page application:
     }
 }
 ```
-## problem
+## Problem
 
 If the html-webpack-plugin is added after the plugin is executed, the plugin will be invalid. The specific reasons are as follows:
 
