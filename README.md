@@ -1,5 +1,7 @@
 # vue-cli-plugin-externals
 
+[![Build Status](https://travis-ci.com/longshihui/vue-cli-plugin-externals.svg?branch=master)](https://travis-ci.com/longshihui/vue-cli-plugin-externals)
+
 > Manage external modules in the project
 
 **Currently only supports cdn module**

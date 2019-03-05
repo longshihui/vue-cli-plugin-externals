@@ -1,5 +1,7 @@
 # vue-cli-plugin-externals
 
+[![Build Status](https://travis-ci.com/longshihui/vue-cli-plugin-externals.svg?branch=master)](https://travis-ci.com/longshihui/vue-cli-plugin-externals)
+
 > 管理项目中的外部模块
 
 **目前仅支持cdn模块**
