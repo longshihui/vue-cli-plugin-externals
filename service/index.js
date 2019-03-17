@@ -39,15 +39,22 @@ function module2HtmlWebpackExternalsPluginOptions(modules) {
             module: module.id,
             entry: module.assets,
             global: module.global
-        })
+        });
     });
     return options;
+}
+
+function isNotExportsModule(module) {
+    return !module.global;
 }
 
 function appendWebpackExternalsConfig(config, modules) {
     // 生成webpack externals配置对象
     let webpackExternals = {};
     modules.forEach((module, moduleId) => {
+        if (isNotExportsModule(module)) {
+            return;
+        }
         webpackExternals[moduleId] = module.global;
     });
     config.externals(webpackExternals);
@@ -60,15 +67,23 @@ module.exports = (api, projectOptions) => {
     // 页面配置
     const pages = projectOptions.pages || {};
     // 通用外部模块配置
-    const commonOptions = _.get(projectOptions, 'pluginOptions.externals.common', []);
-    const pagesOptions = _.get(projectOptions, 'pluginOptions.externals.pages', {});
+    const commonOptions = _.get(
+        projectOptions,
+        'pluginOptions.externals.common',
+        []
+    );
+    const pagesOptions = _.get(
+        projectOptions,
+        'pluginOptions.externals.pages',
+        {}
+    );
     if (Array.isArray(commonOptions)) {
         commonOptions.forEach(module => {
             modules.set(module.id, module);
             commonModules.set(module.id, module);
-        })
+        });
     }
-    
+
     if (_.isPlainObject(pagesOptions)) {
         Object.keys(pages).forEach(pageName => {
             if (pageName in pagesOptions) {
@@ -83,24 +98,28 @@ module.exports = (api, projectOptions) => {
                     pagesModules.set(pageName, pageModules);
                 }
             }
-        })
+        });
     }
-    
+
     api.chainWebpack(config => {
         if (commonModules.size) {
-            config.plugin('externals-modules')
-                .use(HtmlWebpackExternalsPlugin, [
-                    {
-                        externals: module2HtmlWebpackExternalsPluginOptions(commonModules)
-                    }
-                ]);
+            config.plugin('externals-modules').use(HtmlWebpackExternalsPlugin, [
+                {
+                    externals: module2HtmlWebpackExternalsPluginOptions(
+                        commonModules
+                    )
+                }
+            ]);
         }
         for (let [pageName, pageModules] of pagesModules) {
             let pageOption = pages[pageName];
-            config.plugin(`${pageName}-externals-modules`)
+            config
+                .plugin(`${pageName}-externals-modules`)
                 .use(HtmlWebpackExternalsPlugin, [
                     {
-                        externals: module2HtmlWebpackExternalsPluginOptions(pageModules),
+                        externals: module2HtmlWebpackExternalsPluginOptions(
+                            pageModules
+                        ),
                         files: [pageOption.filename || pageName + '.html']
                     }
                 ]);
