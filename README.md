@@ -41,6 +41,7 @@ npm install vue-cli-plugin-externals --dev
 The namespace of the plugin configuration is externals, and the plugin configuration item consists of the following two parts:
 
 1.page-configured page-level external module
+
 2. Commonly configured all page level external modules
 
 When the app is a single-page app, just configure the common field.
@@ -50,9 +51,9 @@ The data structure of the external module configuration is **Module**, and the d
 ```javascript
 // Module
 {
-    Id: string, // Module unique identifier
-    Assets: string | string[], // resource path
-    Global: string // the name of the global variable exposed by the module
+    id: string, // Module unique identifier
+    assets: string | string[], // resource path
+    global?: string | null // The name of the global variable exposed by the module, if it is a non-exported module; please set an empty, or remove this configuration item
 }
 ```
 
@@ -94,17 +95,17 @@ In a single page application:
 ```javascript
 // vue.config.js
 {
-    pluginOptions: {
-        externals: {
-            common: [
-                {
-                    id: 'jquery',
-                    assets: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
-                    global: 'jQuery',
-                },
-            ]
-        }
-    }
+    pluginOptions: {
+        externals: {
+            common: [
+                {
+                    id: 'jquery',
+                    assets: 'https://unpkg.com/jquery@3.2.1/dist/jquery.min.js',
+                    global: 'jQuery'
+                }
+            ];
+        }
+    }
 }
 ```
 
@@ -147,9 +148,9 @@ In a multi-page application:
     }
 }
 ```
+
 ## Problem
 
 If the html-webpack-plugin is added after the plugin is executed, the plugin will be invalid. The specific reasons are as follows:
 
 Https://github.com/jantimon/html-webpack-plugin/issues/1031
-
