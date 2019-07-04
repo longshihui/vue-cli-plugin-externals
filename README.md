@@ -109,6 +109,31 @@ In a single page application:
 }
 ```
 
+In a case where extension is explicitly not provided:
+
+```javascript
+// vue.config.js
+{
+    pluginOptions: {
+        externals: {
+            common: [
+                {
+                    id: 'vue',
+                    assets: [
+                        {
+                            path: 'https://unpkg.com/vue',
+                            type: 'js'
+                        }
+                    ],
+                    assets: 'https://unpkg.com/vue',
+                    global: 'Vue'
+                }
+            ];
+        }
+    }
+}
+```
+
 In a multi-page application:
 
 ```
