@@ -125,7 +125,6 @@ In a case where extension is explicitly not provided:
                             type: 'js'
                         }
                     ],
-                    assets: 'https://unpkg.com/vue',
                     global: 'Vue'
                 }
             ];
