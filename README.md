@@ -49,11 +49,16 @@ When the app is a single-page app, just configure the common field.
 The data structure of the external module configuration is **Module**, and the data structure is as follows
 
 ```javascript
+interface Asset {
+    path: string;
+    type: 'css' | 'js';
+}
+
 // Module
-{
-    id: string, // Module unique identifier
-    assets: string | string[], // resource path
-    global?: string | null // The name of the global variable exposed by the module, if it is a non-exported module; please set an empty, or remove this configuration item
+interface Module {
+    id: string; // Module unique identifier
+    assets: string | string[] | Asset[]; // resource path
+    global?: string | null; // The name of the global variable exposed by the module, if it is a non-exported module; please set an empty, or remove this configuration item
 }
 ```
 

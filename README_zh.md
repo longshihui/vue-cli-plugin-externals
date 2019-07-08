@@ -44,11 +44,16 @@ npm install vue-cli-plugin-externals --dev
 外部模块配置的数据结构为**Module**，数据结构如下
 
 ```javascript
+interface Asset {
+    path: string;
+    type: 'css' | 'js';
+}
+
 // Module
-{
-    id: string, // Module唯一标识符
-    assets: string | string[],  // 资源路径
-    global?: string | null// 模块暴露的全局变量的名字, 如果是一个无导出模块; 请设置一个null，或者移除此配置项
+interface Module {
+    id: string; // Module唯一标识符
+    assets: string | string[] | Asset[]; // 资源路径
+    global?: string | null; // 模块暴露的全局变量的名字, 如果是一个无导出模块; 请设置一个null，或者移除此配置项
 }
 ```
 
@@ -139,6 +144,30 @@ module.exports = {
                         }
                 ]
             }
+        }
+    }
+}
+```
+
+如果 path 里没有明确表明资源扩展名，则需要明确指定资源类型
+
+```javascript
+// vue.config.js
+{
+    pluginOptions: {
+        externals: {
+            common: [
+                {
+                    id: 'vue',
+                    assets: [
+                        {
+                            path: 'https://unpkg.com/vue',
+                            type: 'js'
+                        }
+                    ],
+                    global: 'Vue'
+                }
+            ];
         }
     }
 }
