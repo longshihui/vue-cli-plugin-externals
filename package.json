@@ -1,6 +1,6 @@
 {
     "name": "vue-cli-plugin-externals",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "description": "Manage external modules in your project in vue-cli 3.x",
     "main": "./service/index.js",
     "scripts": {
